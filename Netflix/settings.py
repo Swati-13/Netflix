@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tfpw_d(+2!xn+a(2a_i$1+5y*vl73)j4ywci=0#ssu83mdpa1r'
+SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-tfpw_d(+2!xn+a(2a_i$1+5y*vl73)j4ywci=0#ssu83mdpa1r')
+#SECRET_KEY = 'django-insecure-tfpw_d(+2!xn+a(2a_i$1+5y*vl73)j4ywci=0#ssu83mdpa1r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['netflix-ucqc.onrender.com']
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -161,3 +163,20 @@ LOGIN_REDIRECT_URL='/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.0/howto/static-files/
+
+# This setting tells Django at which URL static files are going to be served to the user.
+# Here, they well be accessible at your-domain.onrender.com/static/...
+
+# Following settings only make sense on production and may break development environments.
+if not DEBUG:
+    # Tell Django to copy statics to the `staticfiles` directory
+    # in your application directory on Render.
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Turn on WhiteNoise storage backend that takes care of compressing static files
+    # and creating unique names for each version so they can safely be cached forever.
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
